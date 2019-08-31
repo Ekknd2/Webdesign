@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title></title>
+	<link rel="stylesheet" href="main.css">
+</head>
+<body>
+	<div class="servers"></div>
+	<div class="server_name">
+		<h2></h2>
+	</div>
+	<div class="channels"></div>
+	<div class="channel_name">
+		<h3></h3>
+	</div>
+	<div class="room"></div>
+
+	<script src="assets/test.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script>
+		console.log(a);
+		let guild_ids = Object.keys(a.guilds);
+		
+		let url = new URL(location.href);
+		let active_guild = parseInt(url.searchParams.get("guild"));
+
+		if (isNaN(active_guild)){
+			window.location.href="?guild=0&channel=0";
+		}
+
+		for (var i = 0; i < guild_ids.length; i++) {
+			let guild_id = guild_ids[i];
+			let guild = a.guilds[guild_id];
+
+			if(guild.image == ""){
+				guild.image = "https://dummyimage.com/600x600/36393f/ffffff.png&text=+";
+			}
+			$(".servers").append(`<a href="?guild=` + i + `&channel=0"><img src="` + guild.image + `" alt="` + guild.name + `"></a>`); 
+		}
+
+		$(".server_name h2").text(a.guilds[guild_ids[active_guild]].name);
+		$(".server_name h2").css("color", a.guilds[guild_ids[active_guild]].color);
+
+		/////////////////////////////////////////////////////////////////////////////////////////
+
+		let channel_ids = Object.keys(a.channels);
+
+		let active_channel = parseInt(url.searchParams.get("channel"));
+
+		let channels = [];
+		for (var i = 0; i < channel_ids.length; i++) {
+			let channel_id = channel_ids[i];
+			if (a.channels[channel_id].guild_id == guild_ids[active_guild]){
+				channels.push(channel_id);
+			}
+		}
+
+		if (channels.length != 0){
+
+			for (var i = 0; i < channels.length; i++) {
+				$(".channels").append(`<a href="?guild=` + active_guild + `&channel=` + i + `">` + a.channels[channels[i]].name + `</a>`);
+			}	
+
+			$(".channel_name h3").text(channels[active_channel].name);
+			$(".channel_name h3").css("color" ,a.guilds[guild_ids[active_guild]].color_channels);
+			$(".channels a").css("color" ,a.guilds[guild_ids[active_guild]].color_channels);
+
+		}
+
+		/////////////////////////////////////////////////////////////////////////////////////////
+
+		let attachment_ids = Object.keys(a.attachments);
+
+		let attachments = [];
+		for (var i = 0; i < attachment_ids.length; i++) {
+			let attachment_id = attachment_ids[i];
+			if (a.attachments[attachment_id].channel_id == channels[active_channel] && (a.channels[channels[active_channel]].guild_id == guild_ids[active_guild])){
+				attachments.push(a.attachments[attachment_id]);
+			}
+		}
+
+		if (attachments.length != 0){
+
+			for (var i = 0; i < attachments.length; i++) {
+				let ext = attachments[i].filename.split(".");
+				let icon;
+
+				switch(ext[ext.length - 1]) {
+					case "png":
+					case "jpg":
+					case "jpeg":
+						icon = "assets/image.png";
+                     	break;
+  				    case "py":
+  				    	icon = "assets/py.png";
+    				 	break;
+    				case "gif":
+    					icon = "assets/gif.png";
+    				 	break;
+    				case "txt":
+    					icon = "assets/txt.png";
+    				 	break;
+ 					default:
+ 						icon = "assets/unknown.png";
+ 				}
+
+				$(".room").append(`<a href="` + attachments[i].url + `" class="attachment" target="_blank"><img src="` + icon + `"><span>` + attachments[i].filename + `</span></a>`);
+			}
+			$(".room a").css("color" ,a.guilds[guild_ids[active_guild]].color_channels);
+			$(".room a").css("border-color" ,a.guilds[guild_ids[active_guild]].color_channels);	
+		}
+
+
+
+		$(".servers a").eq(active_guild).addClass("active");
+		$(".channels a").eq(active_channel).addClass("active");
+		console.log(a);
+	</script>
+</body>
+</html>
