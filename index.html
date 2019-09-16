@@ -18,17 +18,20 @@
 	<div class="room"></div>
 
 	<script src="assets/test.js"></script>
+	<script src="assets/functions.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<script>
 		console.log(a);
 		let guild_ids = Object.keys(a.guilds);
 		
 		let url = new URL(location.href);
-		let active_guild = parseInt(url.searchParams.get("guild"));
+		let active_guild = parseInt(url.searchParams.get("guild"), 10);
 
 		if (isNaN(active_guild)){
 			window.location.href="?guild=0&channel=0";
 		}
+
+		let server_tag = $(".servers");
 
 		for (var i = 0; i < guild_ids.length; i++) {
 			let guild_id = guild_ids[i];
@@ -37,17 +40,18 @@
 			if(guild.image == ""){
 				guild.image = "https://dummyimage.com/600x600/36393f/ffffff.png&text=+";
 			}
-			$(".servers").append(`<a href="?guild=` + i + `&channel=0"><img src="` + guild.image + `" alt="` + guild.name + `"></a>`); 
+			server_tag.append(`<a href="?guild=` + i + `&channel=0"><img src="` + guild.image + `" alt="` + guild.name + `"></a>`); 
 		}
 
-		$(".server_name h2").text(a.guilds[guild_ids[active_guild]].name);
-		$(".server_name h2").css("color", a.guilds[guild_ids[active_guild]].color);
+		let server_name = $(".server_name h2");
+		server_name.text(a.guilds[guild_ids[active_guild]].name);
+		server_name.css("color", a.guilds[guild_ids[active_guild]].color);
 
 		/////////////////////////////////////////////////////////////////////////////////////////
 
 		let channel_ids = Object.keys(a.channels);
 
-		let active_channel = parseInt(url.searchParams.get("channel"));
+		let active_channel = parseInt(url.searchParams.get("channel"), 10);
 
 		let channels = [];
 		for (var i = 0; i < channel_ids.length; i++) {
@@ -56,16 +60,16 @@
 				channels.push(channel_id);
 			}
 		}
-
+		let channels_tag = $(".channels");
 		if (channels.length != 0){
-
 			for (var i = 0; i < channels.length; i++) {
-				$(".channels").append(`<a href="?guild=` + active_guild + `&channel=` + i + `">` + a.channels[channels[i]].name + `</a>`);
+				channels_tag.append(`<a href="?guild=` + active_guild + `&channel=` + i + `">` + a.channels[channels[i]].name + `</a>`);
 			}	
 
-			$(".channel_name h3").text(channels[active_channel].name);
-			$(".channel_name h3").css("color" ,a.guilds[guild_ids[active_guild]].color_channels);
-			$(".channels a").css("color" ,a.guilds[guild_ids[active_guild]].color_channels);
+			let channel_name = $(".channel_name h3");
+			channel_name.text(channels[active_channel].name);
+			channel_name.css("color" ,a.guilds[guild_ids[active_guild]].color_channels);
+			channels_tag.find("a").css("color" ,a.guilds[guild_ids[active_guild]].color_channels);
 
 		}
 
@@ -82,7 +86,7 @@
 		}
 
 		if (attachments.length != 0){
-
+			let room = $(".room");
 			for (var i = 0; i < attachments.length; i++) {
 				let ext = attachments[i].filename.split(".");
 				let icon;
@@ -106,16 +110,17 @@
  						icon = "assets/unknown.png";
  				}
 
-				$(".room").append(`<a href="` + attachments[i].url + `" class="attachment" target="_blank"><img src="` + icon + `"><span>` + attachments[i].filename + `</span></a>`);
+				room.append(`<a href="` + attachments[i].url + `" class="attachment" target="_blank"><img src="` + icon + `"><span>` + attachments[i].filename + `</span></a>`);
 			}
-			$(".room a").css("color" ,a.guilds[guild_ids[active_guild]].color_channels);
-			$(".room a").css("border-color" ,a.guilds[guild_ids[active_guild]].color_channels);	
+			let room_a = room.find("a");
+			room_a.css("color" ,a.guilds[guild_ids[active_guild]].color_channels);
+			room_a.css("border-color" ,a.guilds[guild_ids[active_guild]].color_channels);	
 		}
 
 
 
-		$(".servers a").eq(active_guild).addClass("active");
-		$(".channels a").eq(active_channel).addClass("active");
+		server_tag.find("a").eq(active_guild).addClass("active");
+		channels_tag.find("a").eq(active_channel).addClass("active");
 		console.log(a);
 	</script>
 </body>
